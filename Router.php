@@ -2,110 +2,61 @@
 
 namespace Pure\Router;
 
-/*
-    HOW TO:
-
-    1. Instantiate the router
-    $router = new Router();
-
-    2. define the routes
-    $router->get('/foo', $callback );
-
-    $callback can be:
-        - a function:
-            $router->get('/foo', function(){ ... });
-        - a string:
-            $router->get('/foo', 'foo');
-            where 'foo' if is callable, it will be called or
-            you can call a controller like this:
-            $router->get('/foo', 'FooController@foo');
-
-            Note that, in the example, the controller must have filename: 'FooController.php'
-            and must be located at the path specified in Pure\Router\Route::path()
-
-            About the callable string, it means that the callback can be the name of function
-                function foo(){ ... }
-                $router->get('/foo', 'foo');
-
-                it means that the callback can be, also, the name of  static function
-                class Foo {
-                    public static function foo(){ ... }
-                }
-                $router->get('/foo', 'Foo::foo' );
-
-
-        - an Array
-            With this type of parameter can be called controller form different paths
-            $router->get('/foo', [
-                'filename' => '/mypath/foo.php',
-                'classname' => 'FooController',
-                'action' => 'foo'
-            ]);
-
-    3. Defining routes with parameters
-
-        - Parameters can be defined using $
-            $routes->get('/user/$username', function($username){} );
-
-        - Parameters can be associated with regular expression
-            There are 3 types of default regular expression
-            i: integer
-            a: alphanumeric
-            c: characters
-
-            In this example we define $id as an integer:
-            $router->get('/user/$id:i', function($id){ ... } );
-
-        How to define other regular expression. There are 2 ways:
-            - using regular expression in path expression
-                $router->get('/user/$id:regular_expression', ... )
-
-            - Defining ner router rules
-                $router->rules['key'] = 'regular_expression'
-
-                so that you can use the new one in path definition:
-                $router->get('/foo/$param:key', ... );
-
-*/
-
 class Router {
 
-    // we the routes will be stored
+    // Implementazione del pattern singleton
+    private static $instance = null;
+    public static function main(){
+        if( self::$instance == null )
+            new Router();
+        return self::$instance;
+    }
+
+    // variabile locale in cui andrò a memorizzare tutte le rotte
     private $routes = [];
     private $home = '';
-    // Array which stores the rules ( regular expressions ) used to
-    // match parameters in url
+    // Array in cui è possibile andare a specificare degli alias
+    // per le espressioni regolari
     public $rules = [
         'i'  => '^\d+$', // integer
         'a'  => '[0-9A-Za-z]++', // alphanumeric
         'c'  => '^[a-zA-Z]+$' // characters
     ];
 
-    function __construct(){
-
+    public function __construct(){
+        // mantenimento del riferimento all'oggetto corrente
+        if( self::$instance == null )
+            self::$instance = this;
     }
 
-    function get( $pattern, $callback )
+    // Metodi per la definizione delle rotte
+
+    public function get( $pattern, $callback )
     {
         $this->map( 'GET', $pattern, $callback );
     }
-    function post( $pattern, $callback )
+    public function post( $pattern, $callback )
     {
         $this->map( 'POST', $pattern, $callback );
     }
-    function put( $pattern, $callback )
+    public function put( $pattern, $callback )
     {
         $this->map( 'PUT', $pattern, $callback );
     }
-    function delete( $pattern, $callback )
+    public function delete( $pattern, $callback )
     {
         $this->map( 'DELETE', $pattern, $callback );
     }
 
+    // Questa funzione si occupa di andare a mappare correttamente
+    // le informazioni fornite sulle rotte nella struttura dati locale
     private function map( $method, $pattern, $callback )
     {
+        // In caso di errore in cui il metodo viene omesso
+        // questo viene impostato di default a GET
         if( empty($method) )
             $method = 'GET';
+
         array_push( $this->routes, [
             'method' => $method,
             'pattern' => $pattern,
@@ -113,12 +64,14 @@ class Router {
         ] );
     }
 
-    // Find the best route match
-    function dispatch(){
+    // Trova il match migliore per le rotte specificate
+    public function dispatch(){
+        // Ottieni l'url corrente
         $requestUrl = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+        // Ottieni il metodo della richiesta utente
         $requestMethod = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 
-        // Strip query string (?a=b) from Request Url
+        // Elimina la string a di query (?a=b) dalla Request Url
 		if (($strpos = strpos($requestUrl, '?')) !== false) {
 			$requestUrl = substr($requestUrl, 0, $strpos);
 		}
@@ -127,19 +80,20 @@ class Router {
         $params = [];
 
         foreach( $this->routes as $route ){
-            // if method is the same continue processing the current route
-            // else continue the search
+            // se il metodo della richiesta coincide con quello della rotta iterata
+            // prosegui, altrimenti continua con la prossima rotta
             if( strcasecmp($requestMethod, $route['method']) != 0 )
                 continue;
 
+            // Controllo sulla rotta 'home'
             if( $requestUrl == '/' && $route['pattern'] = '/' ){
                 $match = $route;
                 break;
             }
             else
             {
-                // if the route pattern contains params
-                // do a better search using regex
+                // Se la definizione della rotta prevede la presenza di parametri
+                // Esegui un match applicando le espressioni regolari, se specificate
                 if (($strpos = strpos($route['pattern'], '$')) !== false) {
 
                     $result = $this->complexMatch( $requestUrl, $route['pattern'] );
@@ -150,7 +104,8 @@ class Router {
                     }
 
         		}
-                // else check if pattern and the url are equals
+                // altrimenti, si tratta di verificare un confronto tra due stringhe 
+                // che devono combaciare
                 else {
                     if( rtrim( $requestUrl, '/' ) == rtrim( $route['pattern'], '/' ) ){
                         $match = $route;
@@ -161,7 +116,7 @@ class Router {
 
         }
 
-        // Execute the match
+        // Se il match ha dato risultati, eseguilo
         if( $match != null ){
             $route = new Route( $match['callback'], $params );
             return $route->call();
