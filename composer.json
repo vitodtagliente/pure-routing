@@ -1,0 +1,25 @@
+{
+    "name": "vitodtagliente/pure-framework",
+    "description": "The Pure PHP framework",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vito Domenico Tagliente",
+            "email": "vitodomenicotagliente@gmail.com"
+        }
+    ],
+    "require": {},
+    "replace": {
+        "pure/router": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pure\\": "src/Pure/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}
