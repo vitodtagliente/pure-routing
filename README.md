@@ -26,10 +26,6 @@ The Routing component maps an HTTP request to a set of configuration variables.
         ```php
         $router->get('/foo', 'FooController@foo');
         ```        
-        Note that, in the example, the controller must have filename: **FooController.php** and must be located at the path specified in:
-        ```php
-        Pure\Router\Route::path("path/to/controllers")
-        ```
         About the callable string, it means that the callback can be the name of function like this:
         ```php
         function foo(){ ... }
