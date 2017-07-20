@@ -20,23 +20,31 @@ The Routing component maps an HTTP request to a set of configuration variables.
         ```
     * a string:
         ```php
-        $router->get('/foo', 'foo');
-        ```
-        where **foo** can be a callable object (like a function), or it can be a controller:
-        ```php
-        $router->get('/foo', 'FooController@foo');
-        ```        
-        About the callable string, it means that the callback can be the name of function like this:
-        ```php
         function foo(){ ... }
         $router->get('/foo', 'foo');
         ```
-        it means that the callback can be, also, the name of  static method
+        where **foo** is a function.
+        The callback can be, also, the name of  static method
         ```php
         class Foo {
             public static function foo(){ ... }
         }
         $router->get('/foo', 'Foo::foo' );
+        ```
+        Besides, the callback can be a controller. 
+        ```php
+        $router->get('/foo', 'FooController@action');
+        ```
+        Remember that all the namespace closures must be defined, like in the example:
+        ```php        
+        $router->get('/foo', 'App\Controllers\FooController@action');
+
+        $router->get('/foo', App\Controllers\FooController::class . '@action');
+        ```
+        Usually, controllers are located in the same path. In that case is possible to define a default namespace closure:
+        ```php
+        $router->prefix('App\Controllers\\');
+        $router->get('/foo', 'FooController@action');
         ```
 3. Defining routes with parameters
     - Parameters can be defined using **$**

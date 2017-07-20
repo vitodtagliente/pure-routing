@@ -12,6 +12,13 @@ class Router {
         return self::$instance;
     }
 
+    // Prefisso per l'identificazione dei namespace dei controllori
+    private $prefix = '';
+    public function prefix($value){
+        if( !empty($value) )
+            $this->prefix = $value;
+    }
+
     // variabile locale in cui andrò a memorizzare tutte le rotte
     private $routes = [];
     private $home = '';
@@ -72,9 +79,9 @@ class Router {
         $requestMethod = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 
         // Elimina la string a di query (?a=b) dalla Request Url
-		if (($strpos = strpos($requestUrl, '?')) !== false) {
-			$requestUrl = substr($requestUrl, 0, $strpos);
-		}
+        if (($strpos = strpos($requestUrl, '?')) !== false) {
+            $requestUrl = substr($requestUrl, 0, $strpos);
+        }
 
         $match = null;
         $params = [];
@@ -103,7 +110,7 @@ class Router {
                         break;
                     }
 
-        		}
+                }
                 // altrimenti, si tratta di verificare un confronto tra due stringhe 
                 // che devono combaciare
                 else {
@@ -137,6 +144,11 @@ class Router {
             
             $classname = $callback;
             $action = 'index';
+            // Se non contiene namespace
+            // aggiungi quello definito di default
+            if (($strpos = strpos($classname, '\\')) !== true){
+                $classname = $this->prefix.$classname;
+            }
             // se la stringa contiene @, come nell'esempio: Foo@action1
             // estrai Foo come classname e action1 come method
             if (($strpos = strpos($classname, '@')) !== false){
@@ -144,7 +156,7 @@ class Router {
                 $classname = $pieces[0];
                 $action = $pieces[1];
             }
-
+            
             if( class_exists( $classname ) ){
                 // Instanzia il controllore
                 $_obj = new $classname();
