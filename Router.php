@@ -149,8 +149,10 @@ class Router {
                 // Instanzia il controllore
                 $_obj = new $classname();
                 // chiama il metodo richiesto
-                if ( is_callable( array( $_obj, $action ) ) )
+                if ( is_callable( array( $_obj, $action ) ) ){
                     call_user_func_array( array( $_obj, $action ), $params );
+                    return true;
+                }
                 else return false;
             }
             else return false;
