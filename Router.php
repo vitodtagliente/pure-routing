@@ -118,15 +118,50 @@ class Router {
 
         // Se il match ha dato risultati, eseguilo
         if( $match != null ){
-            $route = new Route( $match['callback'], $params );
-            return $route->call();
+            //$route = new Route( $match['callback'], $params );
+            //return $route->call();
+            return $this->call( $match['callback'], $params );
         }
         return false;
     }
 
-    // Do a match finding params
-    // returns false if the processing fails
-    // returns an array of params if the processing its done
+    // Esegui la richiesta
+    private function call( $callback, $params ){
+        // Se si tratta du una funzione
+        if( is_callable( $callback ) ){
+            call_user_func_array( $callback, $params );
+            return true;
+        }
+        // Si tratta di un controllore
+        else if( is_string( $callback ) ){
+            
+            $classname = $callback;
+            $action = 'index';
+            // se la stringa contiene @, come nell'esempio: Foo@action1
+            // estrai Foo come classname e action1 come method
+            if (($strpos = strpos($classname, '@')) !== false){
+                $pieces = explode( '@', $classname );
+                $classname = $pieces[0];
+                $action = $pieces[1];
+            }
+
+            if( class_exists( $classname ) ){
+                // Instanzia il controllore
+                $_obj = new $classname();
+                // chiama il metodo richiesto
+                if ( is_callable( array( $_obj, $action ) ) )
+                    call_user_func_array( array( $_obj, $action ), $params );
+                else return false;
+            }
+            else return false;
+
+        }
+        else return false;
+    }
+
+    // Verifica se l'url e il pattern specificato corrispondono
+    // in caso di fallimento, ritorna false
+    // in caso di successo, ritorna un array di parametri
     private function complexMatch( $url, $pattern ){
         $url = trim( $url, '/' );
         $pattern = trim( $pattern, '/' );
@@ -134,6 +169,7 @@ class Router {
         $url_pieces = explode( '/', $url );
         $pattern_pieces = explode( '/', $pattern );
 
+        // Se il numero di elementi non combacia è inutile proseguire
         if( count($url_pieces) != count($pattern_pieces) )
             return false;
 
@@ -143,9 +179,9 @@ class Router {
             $u = $url_pieces[$i];
             $p = $pattern_pieces[$i];
 
-            // if the current pattern starts with $
-            // it is a parameter and could contains a regular expression
-            // into a form: $param:regular_expression
+            // Se l'elemento inizia per $, si tratta di un parametro
+            // Verificare se è stata specificata una espressione regolare 
+            // della forma: $param:regular_expression
             if ( 0 === strpos($p, '$') ) {
                 // if contains :
                 // we have to match the specified regular expression
@@ -163,18 +199,20 @@ class Router {
                     $params[ltrim($p, '$')] = $u;
                 }
             }
-            // No params are defined
-            // check if strings are equals
+            // L'elemento non è un parametro
+            // esegui un confronto diretto
             else {
                 if( $u != $p )
                     return false;
             }
         }
 
+        // ritorna la lista dei parametri
+        // definiti della rotta
         return $params;
     }
 
-    // Check if the value matches the pattern ( regular expression )
+    // Verifica il match con le espressioni regolari ( regular expression )
     private function regMatch( $value, $pattern ){
         $pieces = explode( ':', $pattern );
         if( count( $pieces ) <= 1 )
