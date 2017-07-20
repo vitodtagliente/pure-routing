@@ -26,7 +26,7 @@ class Router {
     public function __construct(){
         // mantenimento del riferimento all'oggetto corrente
         if( self::$instance == null )
-            self::$instance = this;
+            self::$instance = $this;
     }
 
     // Metodi per la definizione delle rotte
