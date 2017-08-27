@@ -12,7 +12,7 @@ The Routing component maps an HTTP request to a set of configuration variables.
     ```php    
     $router->get('/foo', $callback );
     ```
-    
+
     $callback can be:
     * a function:
         ```php
@@ -31,7 +31,7 @@ The Routing component maps an HTTP request to a set of configuration variables.
         }
         $router->get('/foo', 'Foo::foo' );
         ```
-        Besides, the callback can be a controller. 
+        Besides, the callback can be a controller.
         ```php
         $router->get('/foo', 'FooController@action');
         ```
@@ -43,7 +43,7 @@ The Routing component maps an HTTP request to a set of configuration variables.
         ```
         Usually, controllers are located in the same path. In that case is possible to define a default namespace closure:
         ```php
-        $router->prefix('App\Controllers\\');
+        $router->namespace('App\Controllers\\');
         $router->get('/foo', 'FooController@action');
         ```
 3. Defining routes with parameters

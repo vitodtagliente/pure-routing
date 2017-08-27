@@ -14,7 +14,7 @@ class Router {
 
     // Prefisso per l'identificazione dei namespace dei controllori
     private $prefix = '';
-    public function prefix($value){
+    public function namespace($value){
         if( !empty($value) )
             $this->prefix = $value;
     }
@@ -111,7 +111,7 @@ class Router {
                     }
 
                 }
-                // altrimenti, si tratta di verificare un confronto tra due stringhe 
+                // altrimenti, si tratta di verificare un confronto tra due stringhe
                 // che devono combaciare
                 else {
                     if( rtrim( $requestUrl, '/' ) == rtrim( $route['pattern'], '/' ) ){
@@ -141,7 +141,7 @@ class Router {
         }
         // Si tratta di un controllore
         else if( is_string( $callback ) ){
-            
+
             $classname = $callback;
             $action = 'index';
             // Se non contiene namespace
@@ -156,7 +156,7 @@ class Router {
                 $classname = $pieces[0];
                 $action = $pieces[1];
             }
-            
+
             if( class_exists( $classname ) ){
                 // Instanzia il controllore
                 $_obj = new $classname();
@@ -194,7 +194,7 @@ class Router {
             $p = $pattern_pieces[$i];
 
             // Se l'elemento inizia per $, si tratta di un parametro
-            // Verificare se è stata specificata una espressione regolare 
+            // Verificare se è stata specificata una espressione regolare
             // della forma: $param:regular_expression
             if ( 0 === strpos($p, '$') ) {
                 // if contains :
