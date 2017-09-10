@@ -1,4 +1,4 @@
-# Pure Router Component
+# Pure Routing Component
 
 The Routing component maps an HTTP request to a set of configuration variables.
 
@@ -6,7 +6,7 @@ The Routing component maps an HTTP request to a set of configuration variables.
 
 1. Instantiate the router
     ```php
-    $router = new Pure/Router/Router();
+    $router = new Pure/Routing/Router();
     ```
 2. define the routes
     ```php    

@@ -1,6 +1,6 @@
 {
-    "name": "vitodtagliente/pure-router",
-    "description": "The Pure Router Component",
+    "name": "vitodtagliente/pure-routing",
+    "description": "The Pure Routing Component",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -12,7 +12,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Pure\\Router\\": ""
+            "Pure\\Routing\\": ""
         }
     },
     "config": {

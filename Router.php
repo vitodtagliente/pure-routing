@@ -1,6 +1,6 @@
 <?php
 
-namespace Pure\Router;
+namespace Pure\Routing;
 
 class Router {
 
