@@ -38,26 +38,26 @@ class Router {
 
     // Metodi per la definizione delle rotte
 
-    public function get( $pattern, $callback )
+    public function get( $pattern, $callback, $middleware = null )
     {
-        $this->map( 'GET', $pattern, $callback );
+        $this->map( 'GET', $pattern, $callback, $middleware );
     }
-    public function post( $pattern, $callback )
+    public function post( $pattern, $callback, $middleware = null )
     {
-        $this->map( 'POST', $pattern, $callback );
+        $this->map( 'POST', $pattern, $callback, $middleware );
     }
-    public function put( $pattern, $callback )
+    public function put( $pattern, $callback, $middleware = null )
     {
-        $this->map( 'PUT', $pattern, $callback );
+        $this->map( 'PUT', $pattern, $callback, $middleware );
     }
-    public function delete( $pattern, $callback )
+    public function delete( $pattern, $callback, $middleware = null )
     {
-        $this->map( 'DELETE', $pattern, $callback );
+        $this->map( 'DELETE', $pattern, $callback, $middleware );
     }
 
     // Questa funzione si occupa di andare a mappare correttamente
     // le informazioni fornite sulle rotte nella struttura dati locale
-    private function map( $method, $pattern, $callback )
+    private function map( $method, $pattern, $callback, $middleware = null )
     {
         // In caso di errore in cui il metodo viene omesso
         // questo viene impostato di default a GET
@@ -67,14 +67,19 @@ class Router {
         array_push( $this->routes, [
             'method' => $method,
             'pattern' => $pattern,
-            'callback' => $callback
+            'callback' => $callback,
+            'middleware' => $middleware
         ] );
+    }
+
+    public function uri(){
+        return isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
     }
 
     // Trova il match migliore per le rotte specificate
     public function dispatch(){
         // Ottieni l'url corrente
-        $requestUrl = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+        $requestUrl = $this->uri();
         // Ottieni il metodo della richiesta utente
         $requestMethod = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 
