@@ -130,9 +130,30 @@ class Router {
 
         // Se il match ha dato risultati, eseguilo
         if( $match != null ){
-            //$route = new Route( $match['callback'], $params );
-            //return $route->call();
-            return $this->call( $match['callback'], $params );
+            // controlla se sono stati definiti middleware
+            if( isset($match['middleware']) )
+            {
+                // the middleware can be a function
+                // o a specified object of Middleware class
+                if( is_callable( $match['middleware'] ) )
+                {   
+                    if(call_user_func($match['middleware']))
+                        return $this->call($match['callback'], $params);
+                }
+                else 
+                {
+                    if(class_exists($match['middleware']))
+                    {
+                        $middleware = new $match['middleware'];
+                        if($middleware && is_a($middleware, '\Pure\Routing\Middleware'))
+                        {
+                            if(call_user_func(array($middleware, 'handle')))
+                                return $this->call($match['callback'], $params);
+                        }
+                    }
+                }
+            }
+            else return $this->call($match['callback'], $params);
         }
         return false;
     }

@@ -2,7 +2,7 @@
 
 namespace Pure\Routing;
 
-abstract class middleware
+abstract class Middleware
 {
     public abstract function handle();
 }
