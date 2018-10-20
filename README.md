@@ -43,7 +43,7 @@ The Routing component maps an HTTP request to a set of configuration variables.
         Is it possible to define namespace alias, like in this example:
         ```php
         $router->namespace('app', 'App\Controllers');
-        $router->get('/foo', 'app:FooController@action');
+        $router->get('/foo', 'app::FooController@action');
         ```
 3. Defining routes with parameters
     - Parameters can be defined using (**$**variable) syntax, like in php

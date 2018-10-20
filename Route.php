@@ -160,10 +160,10 @@ class Route
         	$classname = $this->callback;
             $action = 'index';
         	// controlla se sono presenti namespace 
-        	// del formato namespace:class_name
-            if (($strpos = strpos($classname, ':')) !== false)
+        	// del formato namespace::class_name
+            if (($strpos = strpos($classname, '::')) !== false)
             {
-            	$temp = explode(':', $classname);
+            	$temp = explode('::', $classname);
             	dd($temp);
             	if(count($temp) > 0)
             	{
@@ -172,7 +172,7 @@ class Route
             		{
             			if(!empty($namespaces[$alias]))
             			{
-            				$classname = str_replace("$alias:", $namespaces[$alias] . '\\', $classname);
+            				$classname = str_replace("$alias::", $namespaces[$alias] . '\\', $classname);
             			}
             			else return false;
             		}
