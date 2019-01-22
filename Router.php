@@ -42,7 +42,7 @@ class Router
 	}
 
 	// mappature delle richieste
-	private function map($method, $action, $callback){
+	public function map($method, $action, $callback){
 		$route = new Route($method, $action, $callback);
 		array_push($this->routes, $route);
 		return $route;
