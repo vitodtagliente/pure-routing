@@ -30,9 +30,9 @@ class Route
 
 	public function middleware($class_name)
 	{
-		if(class_exists($class_name) && is_subclass_of(Middleware::class))
+		if(class_exists($class_name) && is_subclass_of(Middleware::class, $class_name))
 		{
-			if(!array_key_exists($class_name, $this->middleware))
+			if(!array_key_exists($class_name, $this->middlewares))
 				array_push($this->middlewares, $class_name);
 		}
 		return $this;
